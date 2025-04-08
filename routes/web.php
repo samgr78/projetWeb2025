@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
 
         // Common life
         Route::get('common-life', [CommonLifeController::class, 'index'])->name('common-life.index');
+        Route::post('common-life', [CommonLifeController::class, 'store'])->name('commonLifeAdmin.store');
     });
 
 });
