@@ -25,14 +25,19 @@ class CommonLifeController extends Controller
         return redirect()->back();
     }
 
-    public function edit(Request $request, $id) {
-        $validatedData = $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'user_id',
-            'date_start',
-            'date_end',
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'titleEdit' => 'required|string|max:255',
+            'descriptionEdit' => 'required|string',
         ]);
-            Task::whereId($id)->update($validatedData);
+
+        $task = Task::findOrFail($id);
+        $task->title = $request->input('titleEdit');
+        $task->description = $request->input('descriptionEdit');
+        $task->save();
+
+        return redirect()->route('common-life.index');
     }
+
 }
