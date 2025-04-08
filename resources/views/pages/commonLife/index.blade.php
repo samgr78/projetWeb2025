@@ -7,14 +7,15 @@
         </h1>
     </x-slot>
     <x-slot name="formAdmin">
-        <form method="Post" action="{{ route('commonLifeAdmin.store') }}"></form>
-        @csrf
-        <x-forms.input label="Title" name="title" type="text"
-                       :placeholder="__('Titre de la tache')"
-                       :messages="$errors->get('title')"/>
+        <form method="Post" action="{{ route('commonLifeAdmin.store') }}">
+            @csrf
+            <x-forms.input label="Title" name="title" type="text"
+                           :placeholder="__('Titre de la tache')"
+                           :messages="$errors->get('title')"/>
 
-        <x-forms.input label="Description" name="description" type="text"
-                       :placeholder="__('Description de la tache')"
-                       :messages="$errors->get('description')"/>
+            <x-forms.input label="Description" name="description" type="text"
+                           :placeholder="__('Description de la tache')"
+                           :messages="$errors->get('description')"/>
+        </form>
     </x-slot>
 </x-app-layout>
