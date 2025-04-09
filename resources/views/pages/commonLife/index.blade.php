@@ -111,11 +111,22 @@
         @endforeach
     </div>
 
-    <div class="stainHistory">
-        <span>
-            {{'Historique des taches'}}
-        </span>
+    @student
+    <div class="stainHistory mt-10">
+        <h2 class="text-lg font-semibold mb-4">{{ __('Historique des tâches') }}</h2>
+
+        <div class="grid gap-4">
+            @foreach($taskCompleteds as $taskCompleted)
+                <div class="cardTask bg-gray-50 p-4 rounded-lg shadow-sm">
+                    <p class="font-semibold">{{ $taskCompleted->title }}</p>
+                    <p class="text-sm text-gray-700">{{ $taskCompleted->description }}</p>
+                    <p class="text-sm text-gray-600">Fait le : {{ $taskCompleted->date }}</p>
+                    <p class="text-sm text-gray-600">Commentaire : {{ $taskCompleted->student_description }}</p>
+                </div>
+            @endforeach
+        </div>
     </div>
+    @endstudent
 {{--    </x-slot>--}}
     <script src="{{ asset('js/dialog.js') }}"></script>
 </x-app-layout>

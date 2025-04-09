@@ -10,8 +10,10 @@ class CommonLifeController extends Controller
 {
     use AuthorizesRequests;
     public function index() {
+        $userId= auth()->user()->id;
         $task = Task::where('completed', false)->get();
-        return view('pages.commonLife.index', compact('task'));
+        $taskCompleteds=Task::where('completed', true ) ->where('user_id', $userId)->get();
+        return view('pages.commonLife.index', compact('task', 'taskCompleteds'));
     }
     public function store(Request $request) {
         $this->authorize('create', Task::class);
