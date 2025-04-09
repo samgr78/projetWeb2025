@@ -40,6 +40,10 @@ class TaskPolicy
         return $user->school()->pivot->role == 'admin';
     }
 
+    public function check(User $user, Task $task): bool{
+        return $user->school()->pivot->role == 'student';
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

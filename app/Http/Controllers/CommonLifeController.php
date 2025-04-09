@@ -10,7 +10,7 @@ class CommonLifeController extends Controller
 {
     use AuthorizesRequests;
     public function index() {
-        $task = Task::all();
+        $task = Task::where('completed', false)->get();
         return view('pages.commonLife.index', compact('task'));
     }
     public function store(Request $request) {
@@ -40,6 +40,23 @@ class CommonLifeController extends Controller
 
         $task->title = $request->input('titleEdit');
         $task->description = $request->input('descriptionEdit');
+        $task->save();
+
+        return redirect()->route('common-life.index');
+    }
+
+    public function check(Request $request, $id) {
+        $task = Task::findOrFail($id);
+        $this->authorize('check', $task);
+        $request->validate([
+            'idStudent' => 'required',
+            'studentDateTask'=>'required|date',
+        ]);
+
+        $task->user_id = $request->input('idStudent');
+        $task->student_description = $request->input('studentCommentTask');
+        $task->date=$request->input('studentDateTask');
+        $task->completed = $request->has('isCompleted') && $request->input('isCompleted') == '1' ? 1 : 0;
         $task->save();
 
         return redirect()->route('common-life.index');

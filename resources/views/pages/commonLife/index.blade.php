@@ -73,8 +73,48 @@
                     </form>
                 </dialog>
                 @endcan
+                @student
+                <button class="btn btn-primary" data-modal-toggle="#modal_1">
+                    Tache accomplie
+                </button>
+                <div class="modal" data-modal="true" id="modal_1">
+                    <div class="modal-content max-w-[600px] top-[20%]">
+                        <div class="modal-header">
+                            <h3 class="modal-title">
+                                {{$taskView->title}}
+                            </h3>
+                            <button class="btn btn-xs btn-icon btn-light" data-modal-dismiss="true">
+                                <i class="ki-outline ki-cross">
+                                </i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {{$taskView->description}}
+                        </div>
+                        <form method="POST" action="{{route ('commonLifeCheckStudent.check', $taskView->id)}}">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="idStudent" value="{{auth()->user()->id}}">
+                            <input type="hidden" name="isCompleted" value="1">
+                            <x-forms.input data-modal-autofocus="true" label="Commentaire" name="studentCommentTask" type="text" :placeholder="__('Facultatif')"/>
+                            <x-forms.input data-modal-autofocus="true" label="Date de la finalisation de la tache" name="studentDateTask" type="date"/>
+
+                            <x-forms.primary-button>
+                                Enregistrer
+                            </x-forms.primary-button>
+
+                        </form>
+                    </div>
+                </div>
+                @endstudent
             </div>
         @endforeach
+    </div>
+
+    <div class="stainHistory">
+        <span>
+            {{'Historique des taches'}}
+        </span>
     </div>
 {{--    </x-slot>--}}
     <script src="{{ asset('js/dialog.js') }}"></script>

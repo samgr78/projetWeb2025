@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
         Route::post('common-life/store', [CommonLifeController::class, 'store'])->name('commonLifeAdmin.store');
         Route::delete('/common-life-admin/{id}', [CommonLifeController::class, 'delete'])->name('commonLifeAdmin.delete');
         Route::put('/common-life/{id}', [CommonLifeController::class, 'update'])->name('commonLifeAdmin.update');
+        Route::put('common-life/check/{id}', [CommonLifeController::class, 'check'])->name('commonLifeCheckStudent.check');
     });
 
 });
