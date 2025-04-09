@@ -7,6 +7,8 @@
         </h1>
     </x-slot>
 {{--    <x-slot name="formAdmin">--}}
+
+    @admin
         <form method="POST" action="{{ route('commonLifeAdmin.store') }}">
             @csrf
             <x-forms.input label="Titre" name="title" type="text"
@@ -21,12 +23,13 @@
                 {{ __('Enregister') }}
             </x-forms.primary-button>
         </form>
-
+    @endadmin
     <div class="tasksView">
         @foreach($task as $taskView)
             <div class="task">
                 <p>{{$taskView->title}}</p>
                 <p>{{$taskView->description}}</p>
+                @can('delete', $taskView)
                 <form method="POST" action="{{route('commonLifeAdmin.delete', $taskView->id)}}">
                     @csrf
                     @method('Delete')
@@ -34,6 +37,8 @@
                         {{ __('Supprimer') }}
                     </x-forms.primary-button>
                 </form>
+                @endcan
+                @can('update', $taskView)
                 <button type="button"
                         class="open-dialog-btn ml-2 bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded"
                         data-dialog-id="edit-dialog-{{ $taskView->id }}">
@@ -67,6 +72,7 @@
                         </x-forms.primary-button>
                     </form>
                 </dialog>
+                @endcan
             </div>
         @endforeach
     </div>
