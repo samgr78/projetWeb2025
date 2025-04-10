@@ -36,7 +36,8 @@ Route::middleware('auth')->group(function () {
 
         // Knowledge
         Route::get('knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
-        Route::post('/knowledge-Language/store', [KnowledgeController::class, 'languageStore'])->name('knowledge-Language.store');
+        Route::post('knowledge/store', [KnowledgeController::class, 'store'])->name('knowledge.store');
+        Route::post('/knowledge-Language/store', [KnowledgeController::class, 'languageStore'])->name('knowledge-language.store');
 
         // Groups
         Route::get('groups', [GroupController::class, 'index'])->name('group.index');
