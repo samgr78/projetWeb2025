@@ -8,9 +8,11 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class KnowledgeController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display the page
      *
@@ -22,6 +24,7 @@ class KnowledgeController extends Controller
     }
 
     public function store(Request $request) {
+        $this->authorize('create', Knowledge::class);
         $request->validate([
            'knowledgeName' => 'required',
            'knowledgeQuestionNumber' => 'required|integer|min:5|max:25',
@@ -37,6 +40,7 @@ class KnowledgeController extends Controller
     }
 
     public function languageStore(Request $request) {
+        $this->authorize('createLanguage', Knowledge::class);
         Language::create([
            'name'=>$request->input('languageName'),
             'difficulty'=>$request->input('languageDifficulty'),
