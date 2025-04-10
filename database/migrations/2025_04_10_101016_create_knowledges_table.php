@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('knowledges', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('language_id')->constrained('languages');
             $table->tinyInteger('question_number');
             $table->tinyInteger('answer_number');
             $table->enum('difficulty', ['beginner', 'intermediate', 'advanced'])->default('intermediate');
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('knowledge');
+        Schema::dropIfExists('knowledges');
     }
 };

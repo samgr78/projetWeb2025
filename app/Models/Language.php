@@ -10,4 +10,9 @@ class Language extends Model
         'name',
         'difficulty',
     ];
+
+    public function knowledges()
+    {
+        return $this->belongsToMany(Knowledge::class, 'knowledges_languages');
+    }
 }
