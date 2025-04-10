@@ -1,13 +1,8 @@
-function myFunction() {
-    // Get the checkbox
-    var checkBox = document.getElementsByClassName("languageCheck");
-    // Get the output text
-    var text = document.getElementsByClassName("choiceComment");
-
-    // If the checkbox is checked, display the output text
-    if (checkBox.checked === true){
-        text.style.display = "block";
+function myFunction(checkbox) {
+    const comment = checkbox.parentElement.nextElementSibling;
+    if (checkbox.checked) {
+        comment.style.display = "block";
     } else {
-        text.style.display = "none";
+        comment.style.display = "none";
     }
 }

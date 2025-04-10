@@ -25,26 +25,35 @@ class KnowledgeController extends Controller
 
     public function store(Request $request) {
         $this->authorize('create', Knowledge::class);
+
         $request->validate([
            'knowledgeName' => 'required',
            'knowledgeQuestionNumber' => 'required|integer|min:5|max:25',
            'knowledgeAnswerNumber' => 'required|integer|min:2|max:5' ,
         ]);
-        Knowledge::create([
+
+        $knowledge=Knowledge::create([
             'name'=>$request->input('knowledgeName'),
             'question_number'=>$request->input('knowledgeQuestionNumber'),
             'answer_number'=>$request->input('knowledgeAnswerNumber'),
             'difficulty'=>$request->input('difficulty'),
         ]);
+
+        $languageIds = $request->input('language_id', []);
+        $knowledge->languages()->sync($languageIds);
+
         return redirect()->route('knowledge.index');
     }
 
     public function languageStore(Request $request) {
+
         $this->authorize('createLanguage', Knowledge::class);
+
         Language::create([
            'name'=>$request->input('languageName'),
             'difficulty'=>$request->input('languageDifficulty'),
         ]);
+
         return redirect()->route('knowledge.index');
     }
 }

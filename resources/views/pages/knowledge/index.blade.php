@@ -28,7 +28,7 @@
                     </select>
 
                     @foreach($languages as $language)
-                        <p>{{$language->name}}: <input type="checkbox" class="languageCheck" onclick="myFunction()"></p>
+                        <p>{{$language->name}}: <input type="checkbox" name="language_id[]" value="{{$language->id}}" class="languageCheck" onclick="myFunction(this)"></p>
                         <p class="choiceComment" style="display:none">le language {{$language->name}} a été ajouté au questionnaire</p>
                     @endforeach
 
