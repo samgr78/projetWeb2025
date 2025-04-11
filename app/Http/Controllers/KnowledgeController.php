@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Knowledge;
 use App\Models\Language;
+use App\Services\GeminiService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use GeminiAPI\Gemini;
+use GeminiAPI\Resources\Parts\TextPart;
+use Illuminate\Support\Facades\Http;
 
 class KnowledgeController extends Controller
 {
@@ -23,7 +27,7 @@ class KnowledgeController extends Controller
         return view('pages.knowledge.index', compact('languages'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request, GeminiService $geminiService) {
         $this->authorize('create', Knowledge::class);
 
         $request->validate([
@@ -39,10 +43,30 @@ class KnowledgeController extends Controller
             'difficulty'=>$request->input('difficulty'),
         ]);
 
-        $languageIds = $request->input('language_id', []);
-        $knowledge->languages()->sync($languageIds);
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . config('services.gemini.api_key');
 
-        return redirect()->route('knowledge.index');
+
+        $prompt = "Fais-moi un questionnaire de {$knowledge->question_number} questions avec {$knowledge->answer_number} réponses,
+        sur les langages de programmation suivants : " . $knowledge->languages->pluck('name')->join(', ') .
+            " avec une difficulté de : {$knowledge->difficulty}.";
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post($url, [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ]
+        ]);
+        $text = $response->json('candidates.0.content.parts.0.text');
+
+        return redirect()->route('knowledge.index', [
+            'languages' => Language::all(),
+            $text
+        ]);
     }
 
     public function languageStore(Request $request) {
@@ -56,4 +80,5 @@ class KnowledgeController extends Controller
 
         return redirect()->route('knowledge.index');
     }
+
 }

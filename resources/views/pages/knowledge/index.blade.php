@@ -36,6 +36,10 @@
                         {{ __('Ajoutez') }}
                     </x-forms.primary-button>
                 </form>
+                @if(isset($text))
+                    <p>{{ $text }}</p>
+                @endif
+
             </div>
         </div>
 
