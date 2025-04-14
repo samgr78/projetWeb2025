@@ -18,4 +18,8 @@ class Knowledge extends Model
     {
         return $this->belongsToMany(Language::class, 'knowledges_languages');
     }
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 }
