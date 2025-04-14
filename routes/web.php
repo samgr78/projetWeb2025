@@ -3,6 +3,7 @@
 use App\Http\Controllers\CohortController;
 use App\Http\Controllers\CommonLifeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RetroController;
 use App\Http\Controllers\StudentController;
@@ -51,6 +52,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/common-life-admin/{id}', [CommonLifeController::class, 'delete'])->name('commonLifeAdmin.delete');
         Route::put('/common-life/{id}', [CommonLifeController::class, 'update'])->name('commonLifeAdmin.update');
         Route::put('common-life/check/{id}', [CommonLifeController::class, 'check'])->name('commonLifeCheckStudent.check');
+
+        // Engagement
+        Route::get('engagement', [EngagementController::class, 'index'])->name('engagement.index');
     });
 
 });
