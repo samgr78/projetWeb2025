@@ -105,14 +105,14 @@
                     </button>
                 </div>
                 <div class="modal-body scrollable-y py-0 my-5 pl-6 pr-3 mr-3">
-                    <form action="usersAnswer" method="post">
+                    <form action="{{route('usersAnswer.store')}}" method="post">
                         @csrf
+                        <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
                         @foreach($questions->where('knowledge_id', $knowledge->id) as $question)
                             <p>{{ $question->question }}</p>
                             @foreach($answers->where('question_id', $question->id) as $answer)
-                                <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
                                 <p>{{ $answer->answer }}:
-                                    <input type="checkbox" name="answerKnowledge" value="{{ $answer->id }}" class="answerCheck">
+                                    <input type="checkbox" name="answerKnowledge[]" value="{{ $answer->id }}" class="answerCheck">
                                 </p>
                             @endforeach
                         @endforeach
@@ -120,16 +120,6 @@
                                 {{ __('Terminer le qcm') }}
                             </x-forms.primary-button>
                     </form>
-                </div>
-                <div class="modal-footer justify-end">
-                    <div class="flex gap-4">
-                        <button class="btn btn-light" data-modal-dismiss="true">
-                            Cancel
-                        </button>
-                        <button class="btn btn-primary">
-                            Submit
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

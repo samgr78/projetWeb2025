@@ -168,11 +168,17 @@ class KnowledgeController extends Controller
         return redirect()->route('knowledge.index');
     }
 
-    public function userAnswersStore(Request $request) {
-        UserAnswer::create([
-            'user_id'=>$request->input('userId'),
-            'answer_id'=>$request->input('answerKnowledge'),
-        ]);
+    public function userAnswersStore(Request $request)
+    {
+        $userId = $request->input('userId');
+        $answerIds = $request->input('answerKnowledge', []);
+
+        foreach ($answerIds as $answerId) {
+            UserAnswer::create([
+                'user_id' => $userId,
+                'answer_id' => $answerId,
+            ]);}
+        return redirect()->route('knowledge.index');
     }
 
 }
