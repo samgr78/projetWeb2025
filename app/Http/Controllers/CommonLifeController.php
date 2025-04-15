@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cohort;
 use App\Models\task;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -11,18 +12,34 @@ class CommonLifeController extends Controller
     use AuthorizesRequests;
     public function index() {
         $userId= auth()->user()->id;
-        $task = Task::where('completed', false)->get();
+        $userCohortIds = auth()->user()->cohorts->pluck('id');
+        $task = Task::where('completed', false)
+            ->whereIn('cohort_id', $userCohortIds)
+            ->get();
+        $cohorts = Cohort::all();
         $taskCompleteds=Task::where('completed', true ) ->where('user_id', $userId)->get();
-        return view('pages.commonLife.index', compact('task', 'taskCompleteds'));
+        return view('pages.commonLife.index', compact('task', 'taskCompleteds', 'cohorts'));
     }
     public function store(Request $request) {
         $this->authorize('create', Task::class);
-        $task=Task::Create([
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'cohortAffectation' => 'required|array',
+            'cohortAffectation.*' => 'exists:cohorts,id',
         ]);
+
+        $task = Task::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+        ]);
+
+        $task->cohorts()->attach($validated['cohortAffectation']);
+
         return redirect()->route('common-life.index');
     }
+
 
     public function delete($id) {
         $task=Task::findOrFail($id);

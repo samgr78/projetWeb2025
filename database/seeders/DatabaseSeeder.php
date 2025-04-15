@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cohort;
+use App\Models\CohortUser;
 use App\Models\School;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -63,6 +65,35 @@ class DatabaseSeeder extends Seeder
             'user_id'   => $user->id,
             'school_id' => $school->id,
             'role'      => 'student'
+        ]);
+
+        Cohort::create([
+            'school_id' => $school->id,
+            'name'      => 'B1',
+            'description' => 'School 1',
+            'start_date' => now(),
+            'end_date'   => now()->addDay(),
+        ]);
+
+        Cohort::create([
+            'school_id' => $school->id,
+            'name'      => 'B2',
+            'description' => 'School 1 b2',
+            'start_date' => now(),
+            'end_date'   => now()->addDay(),
+        ]);
+
+        Cohort::create([
+            'school_id' => $school->id,
+            'name'      => 'B3',
+            'description' => 'School 1 b3',
+            'start_date' => now(),
+            'end_date'   => now()->addDay(),
+        ]);
+
+        CohortUser::create([
+            'user_id'   => $user->id,
+            'cohort_id' => '1',
         ]);
     }
 }

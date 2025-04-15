@@ -19,6 +19,13 @@
                            :placeholder="__('Description de la tache')"
                            :messages="$errors->get('description')"/>
 
+                <label for="cohort">Affecter a une ou plusieurs promotion</label>
+                <select name="cohortAffectation[]" multiple>
+                    @foreach($cohorts as $cohort)
+                    <option value="{{$cohort->id}}">{{$cohort->name}}</option>
+                    @endforeach
+                </select>
+
             <x-forms.primary-button>
                 {{ __('Enregister') }}
             </x-forms.primary-button>

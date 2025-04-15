@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('cohort_id')->nullable()->constrained('cohorts')->onDelete('cascade');
             $table->text('student_description')->nullable();
             $table->date('date')->nullable();
             $table->boolean('completed')->default(false);
