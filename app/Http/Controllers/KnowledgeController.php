@@ -6,6 +6,7 @@ use App\Models\Answer;
 use App\Models\Cohort;
 use App\Models\Cohorts_knowledge;
 use App\Models\Knowledge;
+use App\Models\KnowledgeUser;
 use App\Models\Language;
 use App\Models\Question;
 use App\Models\UserAnswer;
@@ -29,19 +30,27 @@ class KnowledgeController extends Controller
      * @return Factory|View|Application|object
      */
     public function index() {
+        $userId = auth()->id();
         $cohortId = auth()->user()->cohorts()->first()?->id;
+
         $knowledges = Knowledge::whereHas('cohorts', function ($query) use ($cohortId) {
             $query->where('cohort_id', $cohortId);
-        })->get();
-        $knowledgeId=$knowledges->pluck('id');
+        })
+            ->whereDoesntHave('knowledge_user', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->get();
+
+        $knowledgeId = $knowledges->pluck('id');
         $questions = Question::whereIn('knowledge_id', $knowledgeId)->get();
-        $questionId=$questions->pluck('id');
+        $questionId = $questions->pluck('id');
         $answers = Answer::whereIn('question_id', $questionId)->get();
-//        $languageTest=Language::where('')
         $languages = Language::all();
         $cohorts = Cohort::all();
+
         return view('pages.knowledge.index', compact('languages', 'cohorts', 'knowledges', 'questions', 'answers'));
     }
+
 
     public function store(Request $request, GeminiService $geminiService) {
         $this->authorize('create', Knowledge::class);
@@ -178,7 +187,11 @@ class KnowledgeController extends Controller
                 'user_id' => $userId,
                 'answer_id' => $answerId,
             ]);}
+
+        KnowledgeUser::create([
+            'user_id' => $userId,
+            'knowledge_id' => $request->input('knowledgeId'),
+        ]);
         return redirect()->route('knowledge.index');
     }
-
 }

@@ -108,6 +108,7 @@
                     <form action="{{route('usersAnswer.store')}}" method="post">
                         @csrf
                         <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
+                        <input type="hidden" name="knowledgeId" value="{{ $knowledge->id }}">
                         @foreach($questions->where('knowledge_id', $knowledge->id) as $question)
                             <p>{{ $question->question }}</p>
                             @foreach($answers->where('question_id', $question->id) as $answer)

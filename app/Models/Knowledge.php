@@ -28,4 +28,9 @@ class Knowledge extends Model
             ->withPivot('note')
             ->withTimestamps();
     }
+
+    public function knowledge_user()
+    {
+        return $this->hasMany(KnowledgeUser::class);
+    }
 }
