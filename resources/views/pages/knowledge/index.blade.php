@@ -32,6 +32,13 @@
                         <p class="choiceComment" style="display:none">le language {{$language->name}} a été ajouté au questionnaire</p>
                     @endforeach
 
+                    <label for="cohort">Affecter a une ou plusieurs promotion</label>
+                    <select name="cohortAffectation[]" multiple>
+                        @foreach($cohorts as $cohort)
+                            <option value="{{$cohort->id}}">{{$cohort->name}}</option>
+                        @endforeach
+                    </select>
+
                     <x-forms.primary-button>
                         {{ __('Ajoutez') }}
                     </x-forms.primary-button>

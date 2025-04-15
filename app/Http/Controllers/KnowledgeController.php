@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cohort;
 use App\Models\Knowledge;
 use App\Models\Language;
 use App\Services\GeminiService;
@@ -24,7 +25,8 @@ class KnowledgeController extends Controller
      */
     public function index() {
         $languages = Language::all();
-        return view('pages.knowledge.index', compact('languages'));
+        $cohorts = Cohort::all();
+        return view('pages.knowledge.index', compact('languages', 'cohorts'));
     }
 
     public function store(Request $request, GeminiService $geminiService) {
