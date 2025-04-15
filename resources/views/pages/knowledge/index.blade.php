@@ -6,7 +6,7 @@
             </span>
         </h1>
     </x-slot>
-
+    @teacher
         <div class="knowledge">
             <div class="title">
                 <h2>Création de bilan de connaissances</h2>
@@ -32,8 +32,8 @@
                         <p class="choiceComment" style="display:none">le language {{$language->name}} a été ajouté au questionnaire</p>
                     @endforeach
 
-                    <label for="cohort">Affecter a une ou plusieurs promotion</label>
-                    <select name="cohortAffectation[]" multiple>
+                    <label for="cohortKnowledge">Affecter a une ou plusieurs promotion</label>
+                    <select name="cohortAffectationKnowledge[]" multiple>
                         @foreach($cohorts as $cohort)
                             <option value="{{$cohort->id}}">{{$cohort->name}}</option>
                         @endforeach
@@ -49,6 +49,7 @@
 
             </div>
         </div>
+    @endteacher
 
     @admin
     <h2>Ajoutez un language de programmation pour les questionnaires</h2>
@@ -70,6 +71,73 @@
         </x-forms.primary-button>
     </form>
     @endadmin
+
+    @student
+    @foreach($knowledges as $knowledge)
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {{$knowledge->name}}
+                </h3>
+            </div>
+            <div class="card-body">
+                Nombre de questions: {{$knowledge->question_number}}
+                Nombre de réponses: {{$knowledge->answer_number}}
+                Difficulté: {{$knowledge->difficulty}}
+{{--                Language évalué: {{$language}}--}}
+            </div>
+            <div class="card-footer justify-center">
+                <button class="btn btn-primary" data-modal-toggle="#modal_3_1">
+                    Show Modal
+                </button>
+            </div>
+        </div>
+
+        <div class="modal" data-modal="true" id="modal_3_1">
+            <div class="modal-content modal-center-y max-w-[600px] max-h-[95%]">
+                <div class="modal-header">
+                    <h3 class="modal-title">
+                        {{$knowledge->name}}
+                    </h3>
+                    <button class="btn btn-xs btn-icon btn-light" data-modal-dismiss="true">
+                        <i class="ki-outline ki-cross">
+                        </i>
+                    </button>
+                </div>
+                <div class="modal-body scrollable-y py-0 my-5 pl-6 pr-3 mr-3">
+                    <form action="usersAnswer" method="post">
+                        @csrf
+                        @foreach($questions->where('knowledge_id', $knowledge->id) as $question)
+                            <p>{{ $question->question }}</p>
+                            @foreach($answers->where('question_id', $question->id) as $answer)
+                                <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
+                                <p>{{ $answer->answer }}:
+                                    <input type="checkbox" name="answerKnowledge" value="{{ $answer->id }}" class="answerCheck">
+                                </p>
+                            @endforeach
+                        @endforeach
+                            <x-forms.primary-button>
+                                {{ __('Terminer le qcm') }}
+                            </x-forms.primary-button>
+                    </form>
+                </div>
+                <div class="modal-footer justify-end">
+                    <div class="flex gap-4">
+                        <button class="btn btn-light" data-modal-dismiss="true">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    @endstudent
+
+
+
     <script src="{{ asset('js/knowledge.js') }}"></script>
 </x-app-layout>
 

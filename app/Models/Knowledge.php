@@ -22,4 +22,10 @@ class Knowledge extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function cohorts(){
+        return $this->belongsToMany(Cohort::class, 'cohorts_knowledge')
+            ->withPivot('note')
+            ->withTimestamps();
+    }
 }

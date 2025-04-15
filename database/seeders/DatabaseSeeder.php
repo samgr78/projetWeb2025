@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Cohort;
+use App\Models\CohortUser;
 use App\Models\School;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -88,6 +89,11 @@ class DatabaseSeeder extends Seeder
             'description' => 'Coding Factory b2',
             'start_date'=>now(),
             'end_date' => now(),
+        ]);
+
+        CohortUser::create([
+           'cohort_id'   => '1',
+           'user_id'     => $user->id,
         ]);
     }
 }

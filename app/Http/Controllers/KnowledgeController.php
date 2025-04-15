@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Cohort;
+use App\Models\Cohorts_knowledge;
 use App\Models\Knowledge;
 use App\Models\Language;
+use App\Models\Question;
+use App\Models\UserAnswer;
 use App\Services\GeminiService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -14,6 +18,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use GeminiAPI\Gemini;
 use GeminiAPI\Resources\Parts\TextPart;
 use Illuminate\Support\Facades\Http;
+use Psy\Util\Str;
 
 class KnowledgeController extends Controller
 {
@@ -24,9 +29,18 @@ class KnowledgeController extends Controller
      * @return Factory|View|Application|object
      */
     public function index() {
+        $cohortId = auth()->user()->cohorts()->first()?->id;
+        $knowledges = Knowledge::whereHas('cohorts', function ($query) use ($cohortId) {
+            $query->where('cohort_id', $cohortId);
+        })->get();
+        $knowledgeId=$knowledges->pluck('id');
+        $questions = Question::whereIn('knowledge_id', $knowledgeId)->get();
+        $questionId=$questions->pluck('id');
+        $answers = Answer::whereIn('question_id', $questionId)->get();
+//        $languageTest=Language::where('')
         $languages = Language::all();
         $cohorts = Cohort::all();
-        return view('pages.knowledge.index', compact('languages', 'cohorts'));
+        return view('pages.knowledge.index', compact('languages', 'cohorts', 'knowledges', 'questions', 'answers'));
     }
 
     public function store(Request $request, GeminiService $geminiService) {
@@ -44,6 +58,15 @@ class KnowledgeController extends Controller
             'answer_number' => $request->input('knowledgeAnswerNumber'),
             'difficulty' => $request->input('difficulty'),
         ]);
+
+        $cohortIds = $request->input('cohortAffectationKnowledge', []);
+
+        foreach ($cohortIds as $cohortId) {
+            Cohorts_knowledge::create([
+                'cohort_id' => $cohortId,
+                'knowledge_id' => $knowledge->id,
+            ]);
+        }
 
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . config('services.gemini.api_key');
 
@@ -143,6 +166,13 @@ class KnowledgeController extends Controller
         ]);
 
         return redirect()->route('knowledge.index');
+    }
+
+    public function userAnswersStore(Request $request) {
+        UserAnswer::create([
+            'user_id'=>$request->input('userId'),
+            'answer_id'=>$request->input('answerKnowledge'),
+        ]);
     }
 
 }

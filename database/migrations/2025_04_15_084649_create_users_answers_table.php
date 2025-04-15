@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cohorts_knowledge', function (Blueprint $table) {
+        Schema::create('users_answers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cohort_id')->constrained('cohorts')->cascadeOnDelete();
-            $table->foreignId('knowledge_id')->constrained('knowledges')->cascadeOnDelete();
-            $table->tinyInteger('note')->nullable();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('answer_id')->constrained('answers');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cohorts_bilans');
+        Schema::dropIfExists('users_answers');
     }
 };
