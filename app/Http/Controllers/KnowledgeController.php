@@ -194,4 +194,17 @@ class KnowledgeController extends Controller
         ]);
         return redirect()->route('knowledge.index');
     }
+
+    public function getKnowledgeQuestions(Request $request)
+    {
+        $knowledgeId = $request->input('knowledgeId');
+
+        $questions = Question::where('knowledge_id', $knowledgeId)->get();
+        $questionIds = $questions->pluck('id');
+        $answers = Answer::whereIn('question_id', $questionIds)->get();
+
+        $view = view('partials.knowledge-modal-content', compact('questions', 'answers'))->render();
+
+        return response()->json(['html' => $view]);
+    }
 }

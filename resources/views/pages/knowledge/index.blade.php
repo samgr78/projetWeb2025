@@ -6,6 +6,7 @@
             </span>
         </h1>
     </x-slot>
+
     @teacher
         <div class="knowledge">
             <div class="title">
@@ -73,7 +74,12 @@
     @endadmin
 
     @student
-    @foreach($knowledges as $knowledge)
+    <script>
+        window.authUserId = {{ auth()->id() }};
+        window.csrfToken = '{{ csrf_token() }}';
+    </script>
+
+@foreach($knowledges as $knowledge)
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -86,49 +92,66 @@
                 Difficulté: {{$knowledge->difficulty}}
 {{--                Language évalué: {{$language}}--}}
             </div>
-            <div class="card-footer justify-center">
-                <button class="btn btn-primary" data-modal-toggle="#modal_3_1">
-                    Show Modal
-                </button>
-            </div>
         </div>
 
-        <div class="modal" data-modal="true" id="modal_3_1">
-            <div class="modal-content modal-center-y max-w-[600px] max-h-[95%]">
-                <div class="modal-header">
-                    <h3 class="modal-title">
-                        {{$knowledge->name}}
-                    </h3>
-                    <button class="btn btn-xs btn-icon btn-light" data-modal-dismiss="true">
-                        <i class="ki-outline ki-cross">
-                        </i>
-                    </button>
-                </div>
-                <div class="modal-body scrollable-y py-0 my-5 pl-6 pr-3 mr-3">
-                    <form action="{{route('usersAnswer.store')}}" method="post">
-                        @csrf
-                        <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
-                        <input type="hidden" name="knowledgeId" value="{{ $knowledge->id }}">
-                        @foreach($questions->where('knowledge_id', $knowledge->id) as $question)
-                            <p>{{ $question->question }}</p>
-                            @foreach($answers->where('question_id', $question->id) as $answer)
-                                <p>{{ $answer->answer }}:
-                                    <input type="checkbox" name="answerKnowledge[]" value="{{ $answer->id }}" class="answerCheck">
-                                </p>
-                            @endforeach
-                        @endforeach
-                            <x-forms.primary-button>
-                                {{ __('Terminer le qcm') }}
-                            </x-forms.primary-button>
-                    </form>
-                </div>
+        <button class="btn btn-primary open-modal" data-knowledge-id="{{ $knowledge->id }}">
+            Show Modal
+        </button>
+
+    @endforeach
+
+    <div id="dynamicModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg w-[90%] max-w-xl max-h-[80vh] overflow-y-auto p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold" id="modal-title">Chargement...</h3>
+                <button class="text-gray-500 hover:text-gray-800 text-sm" onclick="closeModal()">✖</button>
+            </div>
+            <div id="modal-body" class="space-y-4">
+
             </div>
         </div>
-    @endforeach
+    </div>
+
+
     @endstudent
 
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.open-modal').on('click', function () {
+                const knowledgeId = $(this).data('knowledge-id');
+
+                // Affiche la modale
+                $('#dynamicModal').removeClass('hidden');
+                $('#modal-title').text('Chargement...');
+                $('#modal-body').html('<p>Chargement des questions...</p>');
+
+                $.ajax({
+                    url: "{{ route('knowledge.questions') }}",
+                    type: "GET",
+                    data: { knowledgeId: knowledgeId },
+                    success: function (response) {
+                        $('#modal-title').text("QCM");
+                        $('#modal-body').html(`
+                        <form action="{{ route('usersAnswer.store') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
+                            <input type="hidden" name="knowledgeId" value="${knowledgeId}">
+                            ${response.html}
+                        </form>
+                    `);
+                    },
+                    error: function () {
+                        $('#modal-body').html("<p>Erreur lors du chargement.</p>");
+                    }
+                });
+            });
+        });
+
+        function closeModal() {
+            $('#dynamicModal').addClass('hidden');
+        }
+    </script>
 
 
-    <script src="{{ asset('js/knowledge.js') }}"></script>
 </x-app-layout>
-
