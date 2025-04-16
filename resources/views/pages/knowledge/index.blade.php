@@ -7,6 +7,7 @@
         </h1>
     </x-slot>
 
+    @teacher
         <div class="knowledge">
             <div class="title">
                 <h2>Création de bilan de connaissances</h2>
@@ -32,6 +33,13 @@
                         <p class="choiceComment" style="display:none">le language {{$language->name}} a été ajouté au questionnaire</p>
                     @endforeach
 
+                    <label for="cohortKnowledge">Affecter a une ou plusieurs promotion</label>
+                    <select name="cohortAffectationKnowledge[]" multiple>
+                        @foreach($cohorts as $cohort)
+                            <option value="{{$cohort->id}}">{{$cohort->name}}</option>
+                        @endforeach
+                    </select>
+
                     <x-forms.primary-button>
                         {{ __('Ajoutez') }}
                     </x-forms.primary-button>
@@ -42,6 +50,7 @@
 
             </div>
         </div>
+    @endteacher
 
     @admin
     <h2>Ajoutez un language de programmation pour les questionnaires</h2>
@@ -63,6 +72,86 @@
         </x-forms.primary-button>
     </form>
     @endadmin
-    <script src="{{ asset('js/knowledge.js') }}"></script>
-</x-app-layout>
 
+    @student
+    <script>
+        window.authUserId = {{ auth()->id() }};
+        window.csrfToken = '{{ csrf_token() }}';
+    </script>
+
+@foreach($knowledges as $knowledge)
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {{$knowledge->name}}
+                </h3>
+            </div>
+            <div class="card-body">
+                Nombre de questions: {{$knowledge->question_number}}
+                Nombre de réponses: {{$knowledge->answer_number}}
+                Difficulté: {{$knowledge->difficulty}}
+{{--                Language évalué: {{$language}}--}}
+            </div>
+        </div>
+
+        <button class="btn btn-primary open-modal" data-knowledge-id="{{ $knowledge->id }}">
+            Show Modal
+        </button>
+
+    @endforeach
+
+    <div id="dynamicModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg w-[90%] max-w-xl max-h-[80vh] overflow-y-auto p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold" id="modal-title">Chargement...</h3>
+                <button class="text-gray-500 hover:text-gray-800 text-sm" onclick="closeModal()">✖</button>
+            </div>
+            <div id="modal-body" class="space-y-4">
+
+            </div>
+        </div>
+    </div>
+
+
+    @endstudent
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.open-modal').on('click', function () {
+                const knowledgeId = $(this).data('knowledge-id');
+
+                // Affiche la modale
+                $('#dynamicModal').removeClass('hidden');
+                $('#modal-title').text('Chargement...');
+                $('#modal-body').html('<p>Chargement des questions...</p>');
+
+                $.ajax({
+                    url: "{{ route('knowledge.questions') }}",
+                    type: "GET",
+                    data: { knowledgeId: knowledgeId },
+                    success: function (response) {
+                        $('#modal-title').text("QCM");
+                        $('#modal-body').html(`
+                        <form action="{{ route('usersAnswer.store') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="userId" value="{{ auth()->user()->id }}">
+                            <input type="hidden" name="knowledgeId" value="${knowledgeId}">
+                            ${response.html}
+                        </form>
+                    `);
+                    },
+                    error: function () {
+                        $('#modal-body').html("<p>Erreur lors du chargement.</p>");
+                    }
+                });
+            });
+        });
+
+        function closeModal() {
+            $('#dynamicModal').addClass('hidden');
+        }
+    </script>
+
+
+</x-app-layout>
