@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\task;
+use App\Models\Task;
 use App\Policies\TaskPolicy;
 use Illuminate\Support\ServiceProvider;
 

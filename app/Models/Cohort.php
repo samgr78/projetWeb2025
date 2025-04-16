@@ -12,4 +12,8 @@ class Cohort extends Model
     public function knowledge(){
         return $this->hasMany(Knowledge::class);
     }
+
+    public function task(){
+        return $this->belongToMany(Task::class, 'cohorts_tasks');
+    }
 }
