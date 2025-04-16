@@ -74,9 +74,11 @@
                 </dialog>
                 @endcan
                 @student
-                <button class="btn btn-primary" data-modal-toggle="#modal_1">
-                    Tache accomplie
-                </button>
+                @if($taskView->completed === 0)
+                    <button class="btn btn-primary" data-modal-toggle="#modal_1">
+                        Tache accomplie
+                    </button>
+                @endif
                 <div class="modal" data-modal="true" id="modal_1">
                     <div class="modal-content max-w-[600px] top-[20%]">
                         <div class="modal-header">
