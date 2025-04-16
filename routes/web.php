@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/common-life-admin/{id}', [CommonLifeController::class, 'delete'])->name('commonLifeAdmin.delete');
         Route::put('/common-life/{id}', [CommonLifeController::class, 'update'])->name('commonLifeAdmin.update');
         Route::put('common-life/check/{id}', [CommonLifeController::class, 'check'])->name('commonLifeCheckStudent.check');
+        Route::get('/task-modal', [CommonLifeController::class, 'getTaskModal'])->name('task.modal');
+
     });
 
 });

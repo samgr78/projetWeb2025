@@ -34,91 +34,56 @@
     <div class="tasksView">
         @foreach($task as $taskView)
             <div class="task">
-                <p>{{$taskView->title}}</p>
-                <p>{{$taskView->description}}</p>
+                <p>{{ $taskView->title }}</p>
+                <p>{{ $taskView->description }}</p>
+
                 @can('delete', $taskView)
-                <form method="POST" action="{{route('commonLifeAdmin.delete', $taskView->id)}}">
-                    @csrf
-                    @method('Delete')
-                    <x-forms.primary-button>
-                        {{ __('Supprimer') }}
-                    </x-forms.primary-button>
-                </form>
-                @endcan
-                @can('update', $taskView)
-                <button type="button"
-                        class="open-dialog-btn ml-2 bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded"
-                        data-dialog-id="edit-dialog-{{ $taskView->id }}">
-                    Modifier
-                </button>
-
-                <dialog id="edit-dialog-{{ $taskView->id }}"
-                        class="dialogTask rounded-xl p-6 shadow-xl w-[400px] max-w-full backdrop:bg-black/30">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold">Modifier la tâche</h2>
-                        <button type="button"
-                                class="close-dialog-btn text-gray-500 hover:text-gray-700 text-xl font-bold"
-                                data-dialog-id="edit-dialog-{{ $taskView->id }}">
-                            &times;
-                        </button>
-                    </div>
-
-                    <form class="formUpdate" method="POST" action="{{ route('commonLifeAdmin.update', $taskView->id) }}">
+                    <form method="POST" action="{{ route('commonLifeAdmin.delete', $taskView->id) }}">
                         @csrf
-                        @method('PUT')
-                        <x-forms.input label="Titre" name="titleEdit"
-                                       :value="$taskView->title" type="text" :placeholder="__('Nouveau titre')"
-                                       :messages="$errors->get('titleEdit')"/>
-
-                        <x-forms.input label="Description" name="descriptionEdit"
-                                       :value="$taskView->description" type="text" :placeholder="__('Nouvelle description')"
-                                       :messages="$errors->get('descriptionEdit')"/>
-
+                        @method('DELETE')
                         <x-forms.primary-button>
-                            Enregistrer
+                            {{ __('Supprimer') }}
                         </x-forms.primary-button>
                     </form>
-                </dialog>
                 @endcan
+
+                @can('update', $taskView)
+                    <button type="button"
+                            class="open-dialog-btn ml-2 bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded"
+                            data-dialog-id="edit-dialog-{{ $taskView->id }}">
+                        Modifier
+                    </button>
+
+                    <dialog id="edit-dialog-{{ $taskView->id }}"
+                            class="dialogTask rounded-xl p-6 shadow-xl w-[400px] max-w-full backdrop:bg-black/30">
+                        <!-- Formulaire d'édition -->
+                    </dialog>
+                @endcan
+
                 @student
                 @if($taskView->completed === 0)
-                    <button class="btn btn-primary" data-modal-toggle="#modal_1">
-                        Tache accomplie
+                    <button class="btn btn-primary open-task-modal"
+                            data-task-id="{{ $taskView->id }}">
+                        Tâche accomplie
                     </button>
                 @endif
-                <div class="modal" data-modal="true" id="modal_1">
-                    <div class="modal-content max-w-[600px] top-[20%]">
-                        <div class="modal-header">
-                            <h3 class="modal-title">
-                                {{$taskView->title}}
-                            </h3>
-                            <button class="btn btn-xs btn-icon btn-light" data-modal-dismiss="true">
-                                <i class="ki-outline ki-cross">
-                                </i>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            {{$taskView->description}}
-                        </div>
-                        <form method="POST" action="{{route ('commonLifeCheckStudent.check', $taskView->id)}}">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="idStudent" value="{{auth()->user()->id}}">
-                            <input type="hidden" name="isCompleted" value="1">
-                            <x-forms.input data-modal-autofocus="true" label="Commentaire" name="studentCommentTask" type="text" :placeholder="__('Facultatif')"/>
-                            <x-forms.input data-modal-autofocus="true" label="Date de la finalisation de la tache" name="studentDateTask" type="date"/>
-
-                            <x-forms.primary-button>
-                                Enregistrer
-                            </x-forms.primary-button>
-
-                        </form>
-                    </div>
-                </div>
                 @endstudent
             </div>
         @endforeach
     </div>
+
+    <div id="taskModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-lg w-[90%] max-w-xl max-h-[80vh] overflow-y-auto p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold" id="task-modal-title">Chargement...</h3>
+                <button class="text-gray-500 hover:text-gray-800 text-sm" onclick="closeTaskModal()">✖</button>
+            </div>
+            <div id="task-modal-body" class="space-y-4">
+
+            </div>
+        </div>
+    </div>
+
 
     @student
     <div class="stainHistory mt-10">
@@ -136,6 +101,34 @@
         </div>
     </div>
     @endstudent
-{{--    </x-slot>--}}
-    <script src="{{ asset('js/dialog.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.open-task-modal').on('click', function () {
+                const taskId = $(this).data('task-id');
+
+                $('#taskModal').removeClass('hidden');
+                $('#task-modal-title').text('Chargement...');
+                $('#task-modal-body').html('<p>Chargement du formulaire...</p>');
+
+                $.ajax({
+                    url: "{{ route('task.modal') }}",
+                    type: "GET",
+                    data: { taskId: taskId },
+                    success: function (response) {
+                        $('#task-modal-title').text("Tâche à compléter");
+                        $('#task-modal-body').html(response.html);
+                    },
+                    error: function () {
+                        $('#task-modal-body').html("<p>Erreur lors du chargement de la tâche.</p>");
+                    }
+                });
+            });
+        });
+
+        function closeTaskModal() {
+            $('#taskModal').addClass('hidden');
+        }
+    </script>
+
 </x-app-layout>

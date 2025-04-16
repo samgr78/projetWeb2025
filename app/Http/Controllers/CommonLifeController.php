@@ -78,4 +78,15 @@ class CommonLifeController extends Controller
         return redirect()->route('common-life.index');
     }
 
+    public function getTaskModal(Request $request)
+    {
+        $taskId = $request->input('taskId');
+        $task = Task::findOrFail($taskId);
+
+        return response()->json([
+            'html' => view('partials.task-modal-content', compact('task'))->render()
+        ]);
+    }
+
+
 }
