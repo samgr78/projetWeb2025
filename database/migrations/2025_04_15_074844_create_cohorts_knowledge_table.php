@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cohort_id')->constrained('cohorts')->cascadeOnDelete();
             $table->foreignId('knowledge_id')->constrained('knowledges')->cascadeOnDelete();
-            $table->tinyInteger('note')->nullable();
             $table->timestamps();
         });
     }

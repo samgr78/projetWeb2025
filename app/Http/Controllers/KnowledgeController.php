@@ -81,7 +81,7 @@ class KnowledgeController extends Controller
 
         $prompt = "Génère un questionnaire clair au format strict suivant :
 
-            Format : Question: [texte] | Réponses: [réponse1, réponse2]
+            Format : Question: [texte] | Réponses: [réponse1, réponse2] | Bonne réponse
 
             Ne saute pas de ligne, une seule ligne par question, sans retour à la ligne dans les réponses.
             Évite les étoiles **, les titres, et toute mise en forme inutile.
@@ -115,9 +115,11 @@ class KnowledgeController extends Controller
                 'question' => $questionData['question'],
             ]);
 
-            foreach ($questionData['answers'] as $answerText) {
+            foreach ($questionData['answers'] as $answerData) {
+                //dd($answerData);
                 $question->answers()->create([
-                    'answer' => $answerText,
+                    'answer' => $answerData['text'],
+                    'is_correct' => $answerData['is_correct'] ? 1 : 0,
                 ]);
             }
         }
@@ -131,37 +133,37 @@ class KnowledgeController extends Controller
     {
         $questions = [];
 
-        // Supprimer tout le contenu avant le vrai questionnaire (optionnel mais propre)
-        if (str_contains($text, '**Questionnaire:**')) {
-            $text = Str::after($text, '**Questionnaire:**');
-        }
-
-        // Fusionner les lignes pour éviter les coupures en plein milieu des réponses
-        $text = preg_replace('/\n+/', "\n", $text); // Nettoyer les lignes vides
+        // Séparer le texte ligne par ligne
         $lines = explode("\n", $text);
 
         foreach ($lines as $line) {
-            // Enlever les numéros, espaces, markdown
-            $cleanLine = preg_replace('/^\s*\d+\.\s*/', '', $line);
-            $cleanLine = strip_tags(trim($cleanLine));
+            // Nettoyer la ligne
+            $line = trim($line);
 
-            if (preg_match('/Question\s*:\s*(.*?)\s*\|\s*Réponses\s*:\s*\[(.*?)\]/i', $cleanLine, $matches)) {
+            // Pattern pour le format : Question: ... | Réponses: [...] | Bonne réponse: ...
+            if (preg_match('/^Question\s*:\s*(.*?)\s*\|\s*Réponses\s*:\s*\[(.*?)\]\s*\|\s*Bonne réponse\s*:\s*(.*)$/i', $line, $matches)) {
                 $questionText = trim($matches[1]);
+                $answersRaw = explode(',', $matches[2]);
+                $correctAnswer = trim($matches[3]);
 
-                // Nettoie les réponses
-                $rawAnswers = explode(',', $matches[2]);
-                $answers = array_map('trim', $rawAnswers);
-
-                if (!empty($questionText) && count($answers) > 0) {
-                    $questions[] = [
-                        'question' => $questionText,
-                        'answers' => $answers,
+                $answers = array_map(function ($answer) use ($correctAnswer) {
+                    $cleanedAnswer = trim($answer);
+                    return [
+                        'text' => $cleanedAnswer,
+                        'is_correct' => strcasecmp($cleanedAnswer, $correctAnswer) === 0,
                     ];
-                }
+                }, $answersRaw);
+
+                $questions[] = [
+                    'question' => $questionText,
+                    'answers' => $answers,
+                ];
             }
         }
+
         return $questions;
     }
+
 
 
 
