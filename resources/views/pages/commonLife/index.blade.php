@@ -72,13 +72,13 @@
     </div>
 
     <div id="taskModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-xl shadow-lg w-[90%] max-w-xl max-h-[80vh] overflow-y-auto p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold" id="task-modal-title">Chargement...</h3>
+        <div class="bg-white rounded-xl shadow-lg w-[90%] max-w-xl max-h-[80vh] overflow-y-auto p-6 border border-gray-500">
+            <div class="flex justify-between items-center mb-4 border border-b-gray-200">
+                <h3 class="text-lg font-semibold p-2" id="task-modal-title">Chargement...</h3>
                 <button class="text-gray-500 hover:text-gray-800 text-sm" onclick="closeTaskModal()">✖</button>
             </div>
             {{-- will display the content of the modal --}}
-            <div id="task-modal-body" class="space-y-4">
+            <div id="task-modal-body" class="space-y-4 p-4">
 
             </div>
         </div>
