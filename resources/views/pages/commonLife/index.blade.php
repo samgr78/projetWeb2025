@@ -121,7 +121,7 @@
                         $('#task-modal-body').html(response.html);
                     },
                     error: function () {
-                        $('#task-modal-body').html("<p>Erreur lors du chargement de la tâche.</p>");
+                        $('#task-modal-body').html("<p>Erreur lors du chargement de la tâche</p>");
                     }
                 });
             });
@@ -131,5 +131,4 @@
             $('#taskModal').addClass('hidden');
         }
     </script>
-
 </x-app-layout>
