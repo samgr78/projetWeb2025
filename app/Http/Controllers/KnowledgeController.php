@@ -33,9 +33,11 @@ class KnowledgeController extends Controller
         $userId = auth()->id();
         $cohortId = auth()->user()->cohorts()->first()?->id;
 
+        // we only recover the tasks assigned to the promotion of the connected student who has not yet completed the questionnaire
         $knowledges = Knowledge::whereHas('cohorts', function ($query) use ($cohortId) {
             $query->where('cohort_id', $cohortId);
         })
+            // if the knowledge of the promotion is associated with the student in the pivot table, it is because he has already completed the knowledge
             ->whereDoesntHave('knowledge_user', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
@@ -68,6 +70,7 @@ class KnowledgeController extends Controller
             'difficulty' => $request->input('difficulty'),
         ]);
 
+        // allows you to assign several promotions to the knowledge
         $cohortIds = $request->input('cohortAffectationKnowledge', []);
 
         foreach ($cohortIds as $cohortId) {
@@ -77,6 +80,7 @@ class KnowledgeController extends Controller
             ]);
         }
 
+        // using gemini api
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . config('services.gemini.api_key');
 
         $prompt = "Génère un questionnaire clair au format strict suivant :
@@ -103,10 +107,12 @@ class KnowledgeController extends Controller
         ]);
         $text = $response->json('candidates.0.content.parts.0.text');
 
+        // verification to avoid crashes
         if (!$text || !is_string($text)) {
-            return back()->with('error', 'Erreur : aucune réponse générée par l’API Gemini.');
+            return back()->with('error', 'Erreur : aucune réponse générée par gemini.');
         }
 
+        // will allow us to separate the question from the answers, and from the correct answer
         $questionsAndAnswers = $this->parseQuestionsAndAnswers($text);
 
         // save question and answiers in db
@@ -133,14 +139,14 @@ class KnowledgeController extends Controller
     {
         $questions = [];
 
-        // Séparer le texte ligne par ligne
+        // Separate text line by line
         $lines = explode("\n", $text);
 
         foreach ($lines as $line) {
-            // Nettoyer la ligne
+            // Clean the space line
             $line = trim($line);
 
-            // Pattern pour le format : Question: ... | Réponses: [...] | Bonne réponse: ...
+            // allows you to check the format of the API response to separate everything
             if (preg_match('/^Question\s*:\s*(.*?)\s*\|\s*Réponses\s*:\s*\[(.*?)\]\s*\|\s*Bonne réponse\s*:\s*(.*)$/i', $line, $matches)) {
                 $questionText = trim($matches[1]);
                 $answersRaw = explode(',', $matches[2]);
@@ -150,6 +156,7 @@ class KnowledgeController extends Controller
                     $cleanedAnswer = trim($answer);
                     return [
                         'text' => $cleanedAnswer,
+                        // checks if the response is the correct response and returns a boolean
                         'is_correct' => strcasecmp($cleanedAnswer, $correctAnswer) === 0,
                     ];
                 }, $answersRaw);
@@ -179,6 +186,7 @@ class KnowledgeController extends Controller
         return redirect()->route('knowledge.index');
     }
 
+    // retrieves and saves the user's responses to the questionnaire
     public function userAnswersStore(Request $request)
     {
         $userId = $request->input('userId');
@@ -197,6 +205,7 @@ class KnowledgeController extends Controller
         return redirect()->route('knowledge.index');
     }
 
+    // allows you to inject the content of the questionnaire to avoid having to load all the content of all the questionnaires
     public function getKnowledgeQuestions(Request $request)
     {
         $knowledgeId = $request->input('knowledgeId');
