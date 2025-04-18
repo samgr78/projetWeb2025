@@ -12,11 +12,12 @@ class CommonLifeController extends Controller
     use AuthorizesRequests;
     public function index() {
         $userId= auth()->user()->id;
-        //$task = Task::all();
         $userCohortIds = auth()->user()->cohorts->pluck('id');
+        // retrieves the tasks that are assigned to the user's promotion
         $task = Task::whereHas('cohort', function ($query) use ($userCohortIds) {
             $query->whereIn('cohorts.id', $userCohortIds);
         })->get();
+        // allows you to recover the user's tasks that have already been done for their history
         $taskCompleteds=Task::where('completed', true ) ->where('user_id', $userId)->get();
         $cohorts=Cohort::all();
         return view('pages.commonLife.index', compact('task', 'taskCompleteds','cohorts' ));
@@ -34,11 +35,13 @@ class CommonLifeController extends Controller
             'title' => $request->input('title'),
             'description' => $request->input('description'),
         ]);
+        // allows the pivot table to be filled automatically
         $task->cohort()->attach($validated['cohortAffectation']);
         return redirect()->route('common-life.index');
     }
 
     public function delete($id) {
+        // policy
         $task=Task::findOrFail($id);
         $this->authorize('delete', $task);
         $task->delete();
@@ -61,6 +64,7 @@ class CommonLifeController extends Controller
         return redirect()->route('common-life.index');
     }
 
+    // allows the user to validate a task and comment on it
     public function check(Request $request, $id) {
         $task = Task::findOrFail($id);
         $this->authorize('check', $task);
@@ -78,6 +82,7 @@ class CommonLifeController extends Controller
         return redirect()->route('common-life.index');
     }
 
+    // allow not to load all the content of all the tasks and to do it only when the user presses the button
     public function getTaskModal(Request $request)
     {
         $taskId = $request->input('taskId');
@@ -87,6 +92,4 @@ class CommonLifeController extends Controller
             'html' => view('partials.task-modal-content', compact('task'))->render()
         ]);
     }
-
-
 }

@@ -6,9 +6,10 @@
             </span>
         </h1>
     </x-slot>
-{{--    <x-slot name="formAdmin">--}}
 
+    {{-- @admin allows you to display content only to admins--}}
     @admin
+        {{-- allows you to create a task and assign it to one or more promotions --}}
         <form method="POST" action="{{ route('commonLifeAdmin.store') }}">
             @csrf
             <x-forms.input label="Titre" name="title" type="text"
@@ -36,7 +37,6 @@
             <div class="task">
                 <p>{{ $taskView->title }}</p>
                 <p>{{ $taskView->description }}</p>
-
                 @can('delete', $taskView)
                     <form method="POST" action="{{ route('commonLifeAdmin.delete', $taskView->id) }}">
                         @csrf
@@ -56,7 +56,6 @@
 
                     <dialog id="edit-dialog-{{ $taskView->id }}"
                             class="dialogTask rounded-xl p-6 shadow-xl w-[400px] max-w-full backdrop:bg-black/30">
-                        <!-- Formulaire d'édition -->
                     </dialog>
                 @endcan
 
@@ -78,6 +77,7 @@
                 <h3 class="text-lg font-semibold" id="task-modal-title">Chargement...</h3>
                 <button class="text-gray-500 hover:text-gray-800 text-sm" onclick="closeTaskModal()">✖</button>
             </div>
+            {{-- will display the content of the modal --}}
             <div id="task-modal-body" class="space-y-4">
 
             </div>
@@ -86,6 +86,7 @@
 
 
     @student
+    {{-- show the task history --}}
     <div class="stainHistory mt-10">
         <h2 class="text-lg font-semibold mb-4">{{ __('Historique des tâches') }}</h2>
 

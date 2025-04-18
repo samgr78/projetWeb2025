@@ -1,3 +1,4 @@
+{{-- content to inject into modals--}}
 <div>
     <div class="modal-header">
         {{ $task->title }}

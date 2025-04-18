@@ -16,25 +16,4 @@ class GeminiService
         ]);
         $this->apiKey = env('GEMINI_API_KEY');
     }
-
-    public function generateText($prompt)
-    {
-        $response = $this->client->post('models/gemini-pro:generateContent', [
-            'query' => [
-                'key' => $this->apiKey,
-            ],
-            'json' => [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ]
-            ]
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Pas de réponse';
-    }
 }

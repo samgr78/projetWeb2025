@@ -1,5 +1,4 @@
 import './bootstrap';
-import './dialog';
 
 import Alpine from 'alpinejs';
 

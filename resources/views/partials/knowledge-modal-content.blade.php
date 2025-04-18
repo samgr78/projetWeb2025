@@ -1,3 +1,5 @@
+{{-- content to inject into modals--}}
+
 @foreach($questions as $question)
     <p>{{ $question->question }}</p>
     @foreach($answers->where('question_id', $question->id) as $answer)

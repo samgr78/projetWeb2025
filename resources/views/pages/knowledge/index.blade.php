@@ -13,6 +13,7 @@
                 <h2>Création de bilan de connaissances</h2>
             </div>
             <div class="languageChoice">
+                {{-- create and save a knowledge --}}
                 <form method="post" action="{{route('knowledge.store')}}">
                     @csrf
 
@@ -28,11 +29,13 @@
                         <option value="advanced">Difficulté avancée</option>
                     </select>
 
+                    {{-- show all available language --}}
                     @foreach($languages as $language)
                         <p>{{$language->name}}: <input type="checkbox" name="language_id[]" value="{{$language->id}}" class="languageCheck" onclick="myFunction(this)"></p>
                         <p class="choiceComment" style="display:none">le language {{$language->name}} a été ajouté au questionnaire</p>
                     @endforeach
 
+                    {{-- show all available cohort --}}
                     <label for="cohortKnowledge">Affecter a une ou plusieurs promotion</label>
                     <select name="cohortAffectationKnowledge[]" multiple>
                         @foreach($cohorts as $cohort)
@@ -53,6 +56,7 @@
     @endteacher
 
     @admin
+    {{-- admin content to add new language --}}
     <h2>Ajoutez un language de programmation pour les questionnaires</h2>
     <form method="post" action="{{route ('knowledge-language.store')}}">
         @csrf
@@ -74,6 +78,7 @@
     @endadmin
 
     @student
+    {{-- allows the injection of certain data which is not possible in a .js file --}}
     <script>
         window.authUserId = {{ auth()->id() }};
         window.csrfToken = '{{ csrf_token() }}';
@@ -90,7 +95,6 @@
                 Nombre de questions: {{$knowledge->question_number}}
                 Nombre de réponses: {{$knowledge->answer_number}}
                 Difficulté: {{$knowledge->difficulty}}
-{{--                Language évalué: {{$language}}--}}
             </div>
         </div>
 
@@ -152,6 +156,4 @@
             $('#dynamicModal').addClass('hidden');
         }
     </script>
-
-
 </x-app-layout>

@@ -33,7 +33,7 @@ class KnowledgeController extends Controller
         $userId = auth()->id();
         $cohortId = auth()->user()->cohorts()->first()?->id;
 
-        // we only recover the tasks assigned to the promotion of the connected student who has not yet completed the questionnaire
+        // we only recover the knowledge assigned to the promotion of the connected student who has not yet completed the questionnaire
         $knowledges = Knowledge::whereHas('cohorts', function ($query) use ($cohortId) {
             $query->where('cohort_id', $cohortId);
         })
