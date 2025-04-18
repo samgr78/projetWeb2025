@@ -9,36 +9,36 @@
 
     {{-- @admin allows you to display content only to admins--}}
     @admin
-        {{-- allows you to create a task and assign it to one or more promotions --}}
-        <form method="POST" action="{{ route('commonLifeAdmin.store') }}">
-            @csrf
-            <x-forms.input label="Titre" name="title" type="text"
-                           :placeholder="__('Titre de la tache')"
-                           :messages="$errors->get('title')"/>
+    {{-- allows you to create a task and assign it to one or more promotions --}}
+    <form method="POST" action="{{ route('commonLifeAdmin.store') }}" class="space-y-4">
+        @csrf
+        <x-forms.input label="Titre" name="title" type="text"
+                       :placeholder="__('Titre de la tache')"
+                       :messages="$errors->get('title')"/>
 
-            <x-forms.input label="Description" name="description" type="text"
-                           :placeholder="__('Description de la tache')"
-                           :messages="$errors->get('description')"/>
+        <x-forms.input label="Description" name="description" type="text"
+                       :placeholder="__('Description de la tache')"
+                       :messages="$errors->get('description')"/>
 
-            <label for="cohort">Affecter a une ou plusieurs promotion</label>
-            <select name="cohortAffectation[]" multiple>
-                @foreach($cohorts as $cohort)
-                    <option value="{{$cohort->id}}">{{$cohort->name}}</option>
-                @endforeach
-            </select>
+        <label for="cohort" class="block text-sm font-medium text-gray-700">Affecter a une ou plusieurs promotion</label>
+        <select name="cohortAffectation[]" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            @foreach($cohorts as $cohort)
+                <option value="{{$cohort->id}}">{{$cohort->name}}</option>
+            @endforeach
+        </select>
 
-            <x-forms.primary-button>
-                {{ __('Enregister') }}
-            </x-forms.primary-button>
-        </form>
+        <x-forms.primary-button>
+            {{ __('Enregister') }}
+        </x-forms.primary-button>
+    </form>
     @endadmin
-    <div class="tasksView">
+    <div class="tasksView mt-8 space-y-4">
         @foreach($task as $taskView)
-            <div class="task">
-                <p>{{ $taskView->title }}</p>
-                <p>{{ $taskView->description }}</p>
+            <div class="task border border-gray-200 rounded-md p-4 shadow-sm">
+                <p class="font-semibold">{{ $taskView->title }}</p>
+                <p class="text-sm text-gray-700">{{ $taskView->description }}</p>
                 @can('delete', $taskView)
-                    <form method="POST" action="{{ route('commonLifeAdmin.delete', $taskView->id) }}">
+                    <form method="POST" action="{{ route('commonLifeAdmin.delete', $taskView->id) }}" class="mt-2">
                         @csrf
                         @method('DELETE')
                         <x-forms.primary-button>
@@ -49,7 +49,7 @@
 
                 @can('update', $taskView)
                     <button type="button"
-                            class="open-dialog-btn ml-2 bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded"
+                            class="open-dialog-btn ml-2 bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded mt-2"
                             data-dialog-id="edit-dialog-{{ $taskView->id }}">
                         Modifier
                     </button>
@@ -61,7 +61,7 @@
 
                 @student
                 @if($taskView->completed === 0)
-                    <button class="btn btn-primary open-task-modal"
+                    <button class="btn btn-primary open-task-modal mt-2 bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded"
                             data-task-id="{{ $taskView->id }}">
                         Tâche accomplie
                     </button>
